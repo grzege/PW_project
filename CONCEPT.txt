@@ -1,0 +1,27 @@
+PIÊCIU G£ODOMORÓW
+
+Idea - przy okr¹g³ym stole siedzi 5 g³odomorów i ka¿dy g³odomor ma po swojej lewej i prawej stronie innych g³odomorów. Pomiêdzy ka¿dymi dwoma g³odomorami le¿y widelec. G³odomory mog¹ byæ w trzech stanach (myœli, g³odny, je). Zak³adamy, ¿e g³odomor chce wzi¹æ zawsze wpierw widelec po swojej lewej stronie. W tym momencie istnieje zagro¿enie zakleszczenia w momencie gdy ka¿dy g³odomor weŸmie widelec po swojej lewej stronie jednoczeœnei i nikt nie bêdzie w stanie podnieœæ swojego prawego widelca. Aby to rozwi¹zaæ zastosowa³em metodê 4 talerzy. Tylko g³odomor z talerzem mo¿e za¿¹daæ widelców, dlatego przy 4 talerzach nigdy nie dojdzie do zakleszczenia.
+
+Opis struktur danych - struktury danych s¹ opisane w komentarzach w ka¿dym z kodów *.c. Wykorzysta³em tablice do przechowywania informacji na temat ³¹cznej wagi zjedzonych posi³ków przez ka¿dego z g³odomorów.
+
+Sposób wykorzystania mechanizmów synchronizacji - wykorzysta³em semafory do:
+
+sem_widelec: tzw. semafor widelcowy - tablica semaforów o rozmiarze 5 (1 na ka¿dy widelec), opuszczenie takiego semafora symbolizuje podniesienie widelca przez g³odomora, a podniesienie jego od³o¿enie na stole. Zapewnia wzajemne wykluczanie.
+
+sem_talerzy: tzw. semafor talerzowy - tablica semaforów o rozmiarze 4 (1 na ka¿dy talerz), opuszczenie semafora symbolizuje pobranie przez g³odomora talerza, a podniesienie jego od³o¿enie. Zapobiega zakleszczeniu.
+
+sem_prior: tzw. semafor priorytetowy -  tablica semaforów o rozmiarze 5 (1 na ka¿dego g³odomora), semafor wykorzystywany jest do równomiernego przydzia³u priorytetu do jedzenia (priorytet otrzymuj¹ ci, którzy zjadli dotychczas najmniej). W momencie gdy dowolny g³odomor zje posi³ek, obliczane jest minimum wg wag zjedzonych posi³ków i podnosimy semafor priorytetowy odpowiadaj¹cy temu g³odomorowi, który zjad³ najmniej. Opuszczamy semafor danego g³odomora kiedy ten g³odomor zje posi³ek.
+
+Segment pamiêci wspó³dzielonej wykorzystywany jest do przekazywania informacji o wadze zjedzonych dotychczas posi³ków przez poszczególnych g³odomorów pomiêdzy procesami.
+
+DIABELSKA KOLEJKA
+
+Idea - wagonik kolejki mo¿e pomieœciæ P pasa¿erów z N u¿ytkowników i wyruszyæ w momencie gdy bêdzie pe³en. Nale¿y ograniczyæ pasa¿erów, aby zajmowali tylko jedno miejsce oraz aby nie zajêli wiêcej miejsc ni¿ jest dostêpnych. Nale¿y tak¿e ograniczyæ wagonik, aby czeka³ tak d³ugo, a¿ nie bêdzie pe³en.
+
+Opis struktur danych - za wyj¹tkiem w¹tkow, mutexów i zmiennych warunkowych u¿ywane s¹ tylko dwie zmienne globalne: 
+wagonik - aktualne obci¹¿anie wagonika
+zielone - zmienna wykorzystywana w instrukcji warunkowej kontroluj¹ca iloœæ sygna³ów cond2 wysy³anych do wagonika
+
+Sposób wykorzystania mechanizmów synchronizacji - mutex i mutex2 s³u¿¹ wzajemnemu wykluczaniu. Natomiast zmienne warunkowe:
+cond - wstrzymuje w¹tki (pasa¿erów), którzy ju¿ wsiadli do wagonika, aby umo¿liwiæ innym w¹tkom dostêp do wagonika, do momentu a¿ wagonik nie wyœle sygna³u umo¿liwiaj¹cego wstrzymanym w¹tkom ponowne ubieganie siê o dostêp do wagonika
+cond2 - wstrzymuje wagonik, aby nie ruszy³ do momentu otrzymania sygna³u od pasa¿erów, ¿e wagonik jest pe³en
